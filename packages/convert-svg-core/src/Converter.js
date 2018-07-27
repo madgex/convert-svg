@@ -28,7 +28,6 @@ const fileUrl = require('file-url');
 const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer');
-const tmp = require('tmp');
 const util = require('util');
 
 const readFile = util.promisify(fs.readFile);
@@ -39,13 +38,11 @@ const _convert = Symbol('convert');
 const _destroyed = Symbol('destroyed');
 const _getDimensions = Symbol('getDimensions');
 const _getPage = Symbol('getPage');
-const _getTempFile = Symbol('getTempFile');
 const _options = Symbol('options');
 const _page = Symbol('page');
 const _parseOptions = Symbol('parseOptions');
 const _provider = Symbol('provider');
 const _setDimensions = Symbol('setDimensions');
-const _tempFile = Symbol('tempFile');
 const _validate = Symbol('validate');
 
 /**
@@ -59,8 +56,8 @@ const _validate = Symbol('validate');
  * it to convert a collection of SVG files to files in another format and then destroy it afterwards. It's not
  * recommended to keep an instance around for too long, as it will use up resources.
  *
- * Due constraints within Chromium, the SVG input is first written to a temporary HTML file and then navigated to. This
- * is because the default page for Chromium is using the <code>chrome</code> protocol so cannot load externally
+ * Due constraints within Chromium, the SVG input is placed into a HTML string and then navigated to via a data-uri.
+ * This is because the default page for Chromium is using the <code>chrome</code> protocol so cannot load externally
  * referenced files (e.g. that use the <code>file</code> protocol). This temporary file is reused for the lifespan of
  * each {@link Converter} instance and will be deleted when it is destroyed.
  *
@@ -173,10 +170,6 @@ class Converter {
 
     this[_destroyed] = true;
 
-    if (this[_tempFile]) {
-      this[_tempFile].cleanup();
-      delete this[_tempFile];
-    }
     if (this[_browser]) {
       await this[_browser].close();
       delete this[_browser];
@@ -274,31 +267,11 @@ html { background-color: ${provider.getBackgroundColor(options)}; }
       this[_page] = await this[_browser].newPage();
     }
 
-    const tempFile = await this[_getTempFile]();
+    const dataUri = encodeURI(`data:text/html,${html}`);
 
-    await writeFile(tempFile.path, html);
-
-    await this[_page].goto(fileUrl(tempFile.path));
+    await this[_page].goto(dataUri);
 
     return this[_page];
-  }
-
-  [_getTempFile]() {
-    if (this[_tempFile]) {
-      return Promise.resolve(this[_tempFile]);
-    }
-
-    return new Promise((resolve, reject) => {
-      tmp.file({ prefix: 'convert-svg-', postfix: '.html' }, (error, filePath, fd, cleanup) => {
-        if (error) {
-          reject(error);
-        } else {
-          this[_tempFile] = { path: filePath, cleanup };
-
-          resolve(this[_tempFile]);
-        }
-      });
-    });
   }
 
   [_parseOptions](options, inputFilePath) {

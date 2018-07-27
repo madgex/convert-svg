@@ -1,8 +1,8 @@
 {
-  "name": "convert-svg-to-png",
-  "version": "0.4.0",
+  "name": "@madgex/convert-svg-to-png",
+  "version": "0.4.2",
   "description": "Converts SVG to PNG using headless Chromium",
-  "homepage": "https://github.com/NotNinja/convert-svg",
+  "homepage": "https://github.com/madgex/convert-svg",
   "bugs": {
     "url": "https://github.com/NotNinja/convert-svg/issues"
   },
@@ -22,10 +22,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/NotNinja/convert-svg.git"
+    "url": "https://github.com/madgex/convert-svg.git"
   },
   "dependencies": {
-    "convert-svg-core": "^0.4.0"
+    "@madgex/convert-svg-core": "0.4.1"
   },
   "devDependencies": {
     "convert-svg-test-helper": "^0.4.0",

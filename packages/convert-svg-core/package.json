@@ -1,8 +1,8 @@
 {
-  "name": "convert-svg-core",
-  "version": "0.4.0",
+  "name": "@madgex/convert-svg-core",
+  "version": "0.4.1",
   "description": "Supports converting SVG into another format using headless Chromium",
-  "homepage": "https://github.com/NotNinja/convert-svg",
+  "homepage": "https://github.com/madgex/convert-svg",
   "bugs": {
     "url": "https://github.com/NotNinja/convert-svg/issues"
   },
@@ -22,7 +22,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/NotNinja/convert-svg.git"
+    "url": "https://github.com/madgex/convert-svg.git"
   },
   "dependencies": {
     "chalk": "^2.3.0",
